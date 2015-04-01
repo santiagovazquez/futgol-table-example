@@ -1,0 +1,92 @@
+<html>
+<body>
+    <form id="foo">
+        <p><label for="name">Name:</label>
+            <input id="name" name="name" type="text" value=""></p>
+        <p><label for="comment">Comment:</label><br>
+            <textarea id="comment" name="comment" cols="40"></textarea></p>
+        <p id="result"></p>
+        <input type="submit" value="Send">
+    </form>
+
+    <!--<input name="bar" type="text" value="" />-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.js"></script>
+    <script type="text/javascript">
+//        $(function() {
+//            $.ajax({
+//                url: "https://script.google.com/macros/s/AKfycbzMuIR59RN_S9OTPJYzJQcgijXuUO7J22zoA1qaJuq86XgFpG3b/exec",
+//                type: "post",
+//                crossDomain : true,
+//                dataType: 'jsonp',
+//                headers: { 'Access-Control-Allow-Origin': '*' },
+////                datatype: 'application/json',
+//                data: [
+//                    {bar: "asd"},
+//                    {bar: "ert"}
+//                ],
+//                callback: function() {
+//                    console.log("great!");
+//                }
+//            });
+//        });
+
+
+        jQuery( document ).ready(function( $ ) {
+            // variable to hold request
+            var request;
+            // bind to the submit event of our form
+            $("#foo").submit(function(event){
+                // abort any pending request
+                if (request) {
+                    request.abort();
+                }
+                // setup some local variables
+                var $form = $(this);
+                // let's select and cache all the fields
+                var $inputs = $form.find("input, select, button, textarea");
+                // serialize the data in the form
+                var serializedData = $form.serialize();
+
+                // let's disable the inputs for the duration of the ajax request
+                // Note: we disable elements AFTER the form data has been serialized.
+                // Disabled form elements will not be serialized.
+                $inputs.prop("disabled", true);
+                $('#result').text('Sending data...');
+
+                // fire off the request to /form.php
+                request = $.ajax({
+                    url: "https://script.google.com/macros/s/AKfycbzMuIR59RN_S9OTPJYzJQcgijXuUO7J22zoA1qaJuq86XgFpG3b/exec",
+                    type: "post",
+                    data: serializedData
+                });
+
+                // callback handler that will be called on success
+                request.done(function (response, textStatus, jqXHR){
+                    // log a message to the console
+                    $('#result').html('<a href="https://docs.google.com/spreadsheets/d/1RhkXK_lvytiEnc8xZBOEto0oFpgPYwtIEFo19gzvINg/edit" target="_blank">Success - see Google Sheet</a>');
+                    console.log("Hooray, it worked!");
+                });
+
+                // callback handler that will be called on failure
+                request.fail(function (jqXHR, textStatus, errorThrown){
+                    // log the error to the console
+                    console.error(
+                            "The following error occured: "+
+                            textStatus, errorThrown
+                    );
+                });
+
+                // callback handler that will be called regardless
+                // if the request failed or succeeded
+                request.always(function () {
+                    // reenable the inputs
+                    $inputs.prop("disabled", false);
+                });
+
+                // prevent default posting of form
+                event.preventDefault();
+            });
+        });
+    </script>
+</body>
+</html>
